@@ -70,7 +70,7 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <ScrollArea className="h-[45vh] w-full rounded-md border">
+          <ScrollArea className="h-[70vh] w-full rounded-md border">
             <Textarea
               value={editorContent}
               onChange={(e) => setEditorContent(e.target.value)}
