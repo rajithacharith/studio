@@ -8,7 +8,7 @@ export function Header() {
            <FileJson2 className="h-6 w-6 text-primary" />
         </div>
         <h1 className="text-2xl font-headline font-bold text-primary/90">
-          YAMLForge
+          OpenChoreo Util
         </h1>
       </div>
       <p className="text-sm text-muted-foreground hidden md:block">

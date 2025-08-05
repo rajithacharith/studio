@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'YAMLForge',
+  title: 'OpenChoreo Util',
   description: 'Generate OpenChoreo YAML with AI assistance',
 };
 
