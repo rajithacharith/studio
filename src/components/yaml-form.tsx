@@ -61,7 +61,7 @@ export function YamlForm({ config, setConfig }: YamlFormProps) {
         <CardDescription>Fill in the details to generate your OpenChoreo YAML file.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[60vh] pr-4">
+        <ScrollArea className="h-[70vh] pr-4">
         <Tabs defaultValue="component" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="component">Component</TabsTrigger>
@@ -112,7 +112,7 @@ export function YamlForm({ config, setConfig }: YamlFormProps) {
                  <div className="space-y-4 p-4 border rounded-lg">
                     <div className="space-y-2">
                         <Label htmlFor="build-strategy">Build Strategy</Label>
-                        <Select value={config.build.strategy} onValueChange={(value) => handleNestedInputChange('build', 'strategy', value, value)}>
+                        <Select value={config.build.strategy} onValueChange={(value) => handleInputChange('build', 'strategy', value)}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="google-cloud-buildpacks">Google Cloud Buildpacks</SelectItem>
