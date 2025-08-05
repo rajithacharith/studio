@@ -70,7 +70,7 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <ScrollArea className="h-[75vh] w-full rounded-md border whitespace-nowrap">
+          <ScrollArea className="h-[50vh] w-full rounded-md border whitespace-nowrap">
             <Textarea
               value={editorContent}
               onChange={(e) => setEditorContent(e.target.value)}
@@ -80,18 +80,6 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>
-        {suggestions.length > 0 && (
-             <div className="mt-4">
-                <h4 className="text-sm font-semibold mb-2">Suggestions</h4>
-                <div className="flex flex-wrap gap-2">
-                    {suggestions.map((s, i) => (
-                        <Button key={i} variant="outline" size="sm" onClick={() => applySuggestion(s)}>
-                            {s.split('\n')[0]}...
-                        </Button>
-                    ))}
-                </div>
-            </div>
-        )}
       </CardContent>
       <CardFooter className="flex-wrap gap-2 justify-end">
         <Button variant="outline" onClick={handleCopy}>
