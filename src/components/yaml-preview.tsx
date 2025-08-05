@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription }
 import { useToast } from '@/hooks/use-toast';
 import { Download, Copy, Lightbulb, Loader2, Check } from 'lucide-react';
 import { getSuggestions } from '@/app/actions';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
   const [editorContent, setEditorContent] = useState(generatedYaml);
@@ -70,13 +70,14 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <ScrollArea className="h-[75vh] w-full rounded-md border">
+          <ScrollArea className="h-[75vh] w-full rounded-md border whitespace-nowrap">
             <Textarea
               value={editorContent}
               onChange={(e) => setEditorContent(e.target.value)}
               className="min-h-full w-full font-code text-sm !border-0 !ring-0 focus:!ring-offset-0 focus-visible:!ring-0 resize-none"
               placeholder="Your YAML will appear here..."
             />
+            <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>
         {suggestions.length > 0 && (
