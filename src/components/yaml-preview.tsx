@@ -70,11 +70,11 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <ScrollArea className="h-[50vh] w-full rounded-md border whitespace-nowrap">
+          <ScrollArea className="h-[70vh] w-full rounded-md border">
             <Textarea
               value={editorContent}
               onChange={(e) => setEditorContent(e.target.value)}
-              className="min-h-full w-full font-code text-sm !border-0 !ring-0 focus:!ring-offset-0 focus-visible:!ring-0 resize-none"
+              className="h-full w-full font-code text-sm !border-0 !ring-0 focus:!ring-offset-0 focus-visible:!ring-0 resize-none whitespace-pre"
               placeholder="Your YAML will appear here..."
             />
             <ScrollBar orientation="horizontal" />
