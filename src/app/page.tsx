@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -26,11 +27,22 @@ export default function Home() {
     }
   }, [config, workloadDescriptor]);
 
+  useEffect(() => {
+    // Keep workload descriptor name in sync with deployment workload name
+    if (config.deployment.workloadName !== workloadDescriptor.name) {
+      setWorkloadDescriptor(prev => ({...prev, name: config.deployment.workloadName}));
+    }
+  }, [config.deployment.workloadName, workloadDescriptor.name]);
+
   const handleTemplateSelect = (templateName: TemplateName) => {
-    setConfig(templates[templateName]);
+    const newConfig = templates[templateName];
+    setConfig(newConfig);
     // Also reset workload descriptor when template changes
-    if (templates[templateName].build.enabled) {
-      setWorkloadDescriptor(initialWorkloadDescriptor);
+    if (newConfig.build.enabled) {
+      setWorkloadDescriptor({
+        ...initialWorkloadDescriptor,
+        name: newConfig.deployment.workloadName,
+      });
     }
     setActiveTemplate(templateName);
   };

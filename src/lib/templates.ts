@@ -1,3 +1,4 @@
+
 import { type YamlConfig, type TemplateName, type WorkloadDescriptor } from './definitions';
 
 export const initialConfig: YamlConfig = {
@@ -42,7 +43,7 @@ export const initialConfig: YamlConfig = {
 
 export const initialWorkloadDescriptor: WorkloadDescriptor = {
   apiVersion: 'openchoreo.dev/v1alpha1',
-  name: 'go-reading-list-service',
+  name: 'my-service-workload',
   endpoints: [
     {
       id: crypto.randomUUID(),

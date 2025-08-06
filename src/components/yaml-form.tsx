@@ -1,3 +1,4 @@
+
 'use client';
 
 import { type YamlConfig, type ApiEndpoint, type EnvVar, type WorkloadDescriptor, type WorkloadEndpoint } from '@/lib/definitions';
@@ -53,10 +54,6 @@ export function YamlForm({ config, setConfig, workloadDescriptor, setWorkloadDes
   const handleEnvVarChange = (id: string, field: keyof EnvVar, value: any) => {
     const env = config.workload.env.map(e => e.id === id ? { ...e, [field]: value } : e);
     setConfig({ ...config, workload: { ...config.workload, env } });
-  };
-
-  const handleWorkloadDescriptorChange = (field: keyof WorkloadDescriptor, value: any) => {
-    setWorkloadDescriptor({ ...workloadDescriptor, [field]: value });
   };
 
   const addWorkloadEndpoint = () => {
@@ -132,7 +129,7 @@ export function YamlForm({ config, setConfig, workloadDescriptor, setWorkloadDes
                  <div className="space-y-4 p-4 border rounded-lg">
                     <div className="space-y-2">
                         <Label htmlFor="build-strategy">Build Strategy</Label>
-                        <Select value={config.build.strategy} onValueChange={(value) => handleInputChange('build', 'strategy', value)}>
+                         <Select value={config.build.strategy} onValueChange={(value) => handleInputChange('build', 'strategy', value)}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="google-cloud-buildpacks">Google Cloud Buildpacks</SelectItem>
@@ -182,8 +179,8 @@ export function YamlForm({ config, setConfig, workloadDescriptor, setWorkloadDes
                       <h4 className="text-md font-semibold font-headline">Workload Descriptor (workload.yaml)</h4>
                       <p className="text-sm text-muted-foreground">Define how your workload exposes endpoints. This file should be committed to the root of your service directory.</p>
                        <div className="space-y-2">
-                          <Label htmlFor="workload-descriptor-name">Workload Name</Label>
-                          <Input id="workload-descriptor-name" value={workloadDescriptor.name} onChange={(e) => handleWorkloadDescriptorChange('name', e.target.value)} />
+                          <Label>Workload Name (from Deployment)</Label>
+                          <Input value={workloadDescriptor.name} disabled />
                        </div>
 
                        <div className="space-y-4">
