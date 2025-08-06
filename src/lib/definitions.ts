@@ -61,3 +61,19 @@ export interface YamlConfig {
     port: string;
   };
 }
+
+export type WorkloadEndpointType = 'REST' | 'GraphQL' | 'gRPC' | 'TCP' | 'UDP' | 'HTTP' | 'Websocket';
+
+export interface WorkloadEndpoint {
+    id: string;
+    name: string;
+    port: number;
+    type: WorkloadEndpointType;
+    schemaFile: string;
+}
+
+export interface WorkloadDescriptor {
+    apiVersion: string;
+    name: string;
+    endpoints: WorkloadEndpoint[];
+}

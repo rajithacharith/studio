@@ -1,32 +1,47 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { type YamlConfig, type TemplateName } from '@/lib/definitions';
-import { generateYaml } from '@/lib/yaml-generator';
+import { type YamlConfig, type TemplateName, type WorkloadDescriptor } from '@/lib/definitions';
+import { generateYaml, generateWorkloadDescriptorYaml } from '@/lib/yaml-generator';
 import { YamlForm } from '@/components/yaml-form';
 import { YamlPreview } from '@/components/yaml-preview';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { initialConfig, templates } from '@/lib/templates';
+import { initialConfig, templates, initialWorkloadDescriptor } from '@/lib/templates';
 import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
   const [config, setConfig] = useState<YamlConfig>(initialConfig);
+  const [workloadDescriptor, setWorkloadDescriptor] = useState<WorkloadDescriptor>(initialWorkloadDescriptor);
   const [yamlString, setYamlString] = useState('');
+  const [workloadDescriptorYamlString, setWorkloadDescriptorYamlString] = useState('');
   const [activeTemplate, setActiveTemplate] = useState<TemplateName | 'custom'>('service-build-from-source');
 
   useEffect(() => {
     const newYaml = generateYaml(config);
     setYamlString(newYaml);
-  }, [config]);
+    if (config.build.enabled) {
+      const newWorkloadDescriptorYaml = generateWorkloadDescriptorYaml(workloadDescriptor);
+      setWorkloadDescriptorYamlString(newWorkloadDescriptorYaml);
+    }
+  }, [config, workloadDescriptor]);
 
   const handleTemplateSelect = (templateName: TemplateName) => {
     setConfig(templates[templateName]);
+    // Also reset workload descriptor when template changes
+    if (templates[templateName].build.enabled) {
+      setWorkloadDescriptor(initialWorkloadDescriptor);
+    }
     setActiveTemplate(templateName);
   };
   
   const handleFormChange = (newConfig: YamlConfig) => {
     setConfig(newConfig);
+    setActiveTemplate('custom');
+  }
+
+  const handleWorkloadDescriptorChange = (newDescriptor: WorkloadDescriptor) => {
+    setWorkloadDescriptor(newDescriptor);
     setActiveTemplate('custom');
   }
 
@@ -53,8 +68,16 @@ export default function Home() {
         </div>
         <Separator className="my-6" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          <YamlForm config={config} setConfig={handleFormChange} />
-          <YamlPreview generatedYaml={yamlString} />
+          <YamlForm 
+            config={config} 
+            setConfig={handleFormChange} 
+            workloadDescriptor={workloadDescriptor}
+            setWorkloadDescriptor={handleWorkloadDescriptorChange}
+          />
+          <YamlPreview 
+            generatedYaml={yamlString} 
+            workloadDescriptorYaml={config.build.enabled ? workloadDescriptorYamlString : undefined}
+          />
         </div>
       </main>
     </div>

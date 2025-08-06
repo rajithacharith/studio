@@ -1,6 +1,6 @@
 'use client';
 
-import { type YamlConfig, type ApiEndpoint, type EnvVar } from '@/lib/definitions';
+import { type YamlConfig, type ApiEndpoint, type EnvVar, type WorkloadDescriptor, type WorkloadEndpoint } from '@/lib/definitions';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -14,9 +14,11 @@ import { ScrollArea } from './ui/scroll-area';
 interface YamlFormProps {
   config: YamlConfig;
   setConfig: (config: YamlConfig) => void;
+  workloadDescriptor: WorkloadDescriptor;
+  setWorkloadDescriptor: (descriptor: WorkloadDescriptor) => void;
 }
 
-export function YamlForm({ config, setConfig }: YamlFormProps) {
+export function YamlForm({ config, setConfig, workloadDescriptor, setWorkloadDescriptor }: YamlFormProps) {
   const handleInputChange = (part: keyof YamlConfig, field: string, value: any) => {
     const newConfig = { ...config };
     (newConfig[part] as any)[field] = value;
@@ -51,6 +53,24 @@ export function YamlForm({ config, setConfig }: YamlFormProps) {
   const handleEnvVarChange = (id: string, field: keyof EnvVar, value: any) => {
     const env = config.workload.env.map(e => e.id === id ? { ...e, [field]: value } : e);
     setConfig({ ...config, workload: { ...config.workload, env } });
+  };
+
+  const handleWorkloadDescriptorChange = (field: keyof WorkloadDescriptor, value: any) => {
+    setWorkloadDescriptor({ ...workloadDescriptor, [field]: value });
+  };
+
+  const addWorkloadEndpoint = () => {
+    const newEndpoint: WorkloadEndpoint = { id: crypto.randomUUID(), name: '', port: 8080, type: 'REST', schemaFile: '' };
+    setWorkloadDescriptor({ ...workloadDescriptor, endpoints: [...workloadDescriptor.endpoints, newEndpoint] });
+  };
+
+  const removeWorkloadEndpoint = (id: string) => {
+    setWorkloadDescriptor({ ...workloadDescriptor, endpoints: workloadDescriptor.endpoints.filter(e => e.id !== id) });
+  };
+
+  const handleWorkloadEndpointChange = (id: string, field: keyof WorkloadEndpoint, value: any) => {
+    const endpoints = workloadDescriptor.endpoints.map(e => e.id === id ? { ...e, [field]: value } : e);
+    setWorkloadDescriptor({ ...workloadDescriptor, endpoints });
   };
 
 
@@ -158,6 +178,57 @@ export function YamlForm({ config, setConfig }: YamlFormProps) {
                             </div>
                         </div>
                     )}
+                    <div className="space-y-4 pt-4 border-t">
+                      <h4 className="text-md font-semibold font-headline">Workload Descriptor (workload.yaml)</h4>
+                      <p className="text-sm text-muted-foreground">Define how your workload exposes endpoints. This file should be committed to the root of your service directory.</p>
+                       <div className="space-y-2">
+                          <Label htmlFor="workload-descriptor-name">Workload Name</Label>
+                          <Input id="workload-descriptor-name" value={workloadDescriptor.name} onChange={(e) => handleWorkloadDescriptorChange('name', e.target.value)} />
+                       </div>
+
+                       <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <Label>Endpoints</Label>
+                            <Button variant="ghost" size="sm" onClick={addWorkloadEndpoint}><PlusCircle className="w-4 h-4 mr-2"/>Add Endpoint</Button>
+                          </div>
+                          {workloadDescriptor.endpoints.map((endpoint, index) => (
+                            <div key={endpoint.id} className="space-y-3 p-3 border rounded-md">
+                                <div className="flex justify-end">
+                                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => removeWorkloadEndpoint(endpoint.id)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor={`wd-ep-name-${index}`}>Endpoint Name</Label>
+                                  <Input id={`wd-ep-name-${index}`} value={endpoint.name} onChange={(e) => handleWorkloadEndpointChange(endpoint.id, 'name', e.target.value)} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                      <Label htmlFor={`wd-ep-port-${index}`}>Port</Label>
+                                      <Input id={`wd-ep-port-${index}`} type="number" value={endpoint.port} onChange={(e) => handleWorkloadEndpointChange(endpoint.id, 'port', parseInt(e.target.value))} />
+                                  </div>
+                                  <div className="space-y-2">
+                                      <Label htmlFor={`wd-ep-type-${index}`}>Type</Label>
+                                      <Select value={endpoint.type} onValueChange={(value) => handleWorkloadEndpointChange(endpoint.id, 'type', value)}>
+                                          <SelectTrigger><SelectValue /></SelectTrigger>
+                                          <SelectContent>
+                                              <SelectItem value="REST">REST</SelectItem>
+                                              <SelectItem value="GraphQL">GraphQL</SelectItem>
+                                              <SelectItem value="gRPC">gRPC</SelectItem>
+                                              <SelectItem value="TCP">TCP</SelectItem>
+                                              <SelectItem value="UDP">UDP</SelectItem>
+                                              <SelectItem value="HTTP">HTTP</SelectItem>
+                                              <SelectItem value="Websocket">Websocket</SelectItem>
+                                          </SelectContent>
+                                      </Select>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor={`wd-ep-schema-${index}`}>Schema File (optional)</Label>
+                                  <Input id={`wd-ep-schema-${index}`} value={endpoint.schemaFile} onChange={(e) => handleWorkloadEndpointChange(endpoint.id, 'schemaFile', e.target.value)} placeholder="e.g., docs/openapi.yaml"/>
+                                </div>
+                            </div>
+                          ))}
+                       </div>
+                    </div>
                  </div>
              )}
           </TabsContent>

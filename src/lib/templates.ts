@@ -1,4 +1,4 @@
-import { type YamlConfig, type TemplateName } from './definitions';
+import { type YamlConfig, type TemplateName, type WorkloadDescriptor } from './definitions';
 
 export const initialConfig: YamlConfig = {
     apiVersion: 'openchoreo.dev/v1alpha1',
@@ -39,6 +39,21 @@ export const initialConfig: YamlConfig = {
       port: '8080'
     },
 };
+
+export const initialWorkloadDescriptor: WorkloadDescriptor = {
+  apiVersion: 'openchoreo.dev/v1alpha1',
+  name: 'go-reading-list-service',
+  endpoints: [
+    {
+      id: crypto.randomUUID(),
+      name: 'rest-api',
+      port: 8080,
+      type: 'REST',
+      schemaFile: 'docs/openapi.yaml',
+    },
+  ],
+};
+
 
 const serviceBuildFromSource: YamlConfig = { ...initialConfig };
 

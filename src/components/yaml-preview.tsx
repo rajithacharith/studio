@@ -8,8 +8,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Download, Copy, Lightbulb, Loader2, Check } from 'lucide-react';
 import { getSuggestions } from '@/app/actions';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
-export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
+interface YamlPreviewProps {
+  generatedYaml: string;
+  workloadDescriptorYaml?: string;
+}
+
+export function YamlPreview({ generatedYaml, workloadDescriptorYaml }: YamlPreviewProps) {
+  const [activeTab, setActiveTab] = useState("component");
   const [editorContent, setEditorContent] = useState(generatedYaml);
   const [isCopied, setIsCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -17,8 +24,18 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    setEditorContent(generatedYaml);
-  }, [generatedYaml]);
+    if (activeTab === 'component') {
+      setEditorContent(generatedYaml);
+    } else if (activeTab === 'workload' && workloadDescriptorYaml) {
+      setEditorContent(workloadDescriptorYaml);
+    }
+  }, [generatedYaml, workloadDescriptorYaml, activeTab]);
+
+  useEffect(() => {
+    if(workloadDescriptorYaml === undefined && activeTab === 'workload') {
+      setActiveTab('component');
+    }
+  }, [workloadDescriptorYaml, activeTab]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(editorContent);
@@ -32,7 +49,7 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'config.yml';
+    a.download = activeTab === 'component' ? 'component.yaml' : 'workload.yaml';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -62,6 +79,20 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
     setSuggestions([]);
   }
 
+  const PreviewArea = ({value}: {value: string}) => (
+     <div className="relative">
+        <ScrollArea className="h-[50vh] w-full rounded-md border">
+          <Textarea
+            value={value}
+            onChange={(e) => setEditorContent(e.target.value)}
+            className="min-h-full w-full font-code text-sm !border-0 !ring-0 focus:!ring-offset-0 focus-visible:!ring-0 resize-none whitespace-pre"
+            placeholder="Your YAML will appear here..."
+          />
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
+  )
+
   return (
     <Card className="sticky top-6">
       <CardHeader>
@@ -69,17 +100,25 @@ export function YamlPreview({ generatedYaml }: { generatedYaml: string }) {
         <CardDescription>Preview, edit, and download your YAML file.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="relative">
-          <ScrollArea className="h-[70vh] w-full rounded-md border">
-            <Textarea
-              value={editorContent}
-              onChange={(e) => setEditorContent(e.target.value)}
-              className="h-full w-full font-code text-sm !border-0 !ring-0 focus:!ring-offset-0 focus-visible:!ring-0 resize-none whitespace-pre"
-              placeholder="Your YAML will appear here..."
-            />
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
+       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList>
+            <TabsTrigger value="component">Component</TabsTrigger>
+            {workloadDescriptorYaml && <TabsTrigger value="workload">Workload</TabsTrigger>}
+        </TabsList>
+        <TabsContent value="component">
+            <PreviewArea value={editorContent} />
+        </TabsContent>
+        {workloadDescriptorYaml && 
+            <TabsContent value="workload">
+                 <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800">
+                    Commit this <code className="font-code bg-blue-100 px-1 rounded">workload.yaml</code> file to the root of your service directory.
+                </div>
+                <div className="mt-4">
+                    <PreviewArea value={editorContent} />
+                </div>
+            </TabsContent>
+        }
+       </Tabs>
       </CardContent>
       <CardFooter className="flex-wrap gap-2 justify-end">
         <Button variant="outline" onClick={handleCopy}>

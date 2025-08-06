@@ -1,4 +1,4 @@
-import { type YamlConfig } from './definitions';
+import { type YamlConfig, type WorkloadDescriptor } from './definitions';
 
 const indent = (level: number) => '  '.repeat(level);
 
@@ -156,4 +156,39 @@ export const generateYaml = (config: YamlConfig): string => {
   ];
 
   return parts.filter(p => p).join('\n');
+};
+
+export const generateWorkloadDescriptorYaml = (descriptor: WorkloadDescriptor): string => {
+    let yaml = `# OpenChoreo Workload Descriptor\n`;
+    yaml += `# This file defines how your workload exposes endpoints and connects to other services.\n`;
+    yaml += `# It sits alongside your source code and gets converted to a Workload Custom Resource (CR).\n`;
+    yaml += `apiVersion: ${descriptor.apiVersion}\n\n`;
+    yaml += `# Basic metadata for the workload\n`;
+    yaml += `metadata:\n`;
+    yaml += `${indent(1)}# +required Name of the workload\n`;
+    yaml += `${indent(1)}name: ${descriptor.name}\n\n`;
+
+    if (descriptor.endpoints.length > 0) {
+        yaml += `# +optional Incoming connection details for the component\n`;
+        yaml += `# Endpoints define the network interfaces that this workload exposes to other services\n`;
+        yaml += `endpoints:\n`;
+        descriptor.endpoints.forEach(endpoint => {
+            yaml += `${indent(1)}- # +required Unique name for the endpoint\n`;
+            yaml += `${indent(2)}# This name will be used when generating the managed API and as the key in the CR map\n`;
+            yaml += `${indent(2)}name: ${endpoint.name}\n`;
+            yaml += `${indent(2)}# +required Numeric port value that gets exposed via the endpoint\n`;
+            yaml += `${indent(2)}port: ${endpoint.port}\n`;
+            yaml += `${indent(2)}# +required Type of traffic that the endpoint is accepting\n`;
+            yaml += `${indent(2)}# Allowed values: REST, GraphQL, gRPC, TCP, UDP, HTTP, Websocket\n`;
+            yaml += `${indent(2)}type: ${endpoint.type}\n`;
+            if (endpoint.schemaFile) {
+                yaml += `${indent(2)}# +optional The path to the schema definition file\n`;
+                yaml += `${indent(2)}# This is applicable to REST, GraphQL, and gRPC endpoint types\n`;
+                yaml += `${indent(2)}# The path should be relative to the workload.yaml file location\n`;
+                yaml += `${indent(2)}schemaFile: ${endpoint.schemaFile}\n`;
+            }
+        });
+    }
+
+    return yaml;
 };
